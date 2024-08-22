@@ -28,6 +28,7 @@ class ResolutionProofingJob < ApplicationJob
     proofing_components: nil
   )
     timer = JobHelpers::Timer.new
+    sleep(rand(5) + 2)
 
     raise_stale_job! if stale_job?(enqueued_at)
 
