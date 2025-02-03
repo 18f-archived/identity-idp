@@ -8,6 +8,7 @@ module Idv
 
       before_action :set_usps_form_presenter
       before_action :confirm_step_allowed
+      before_action :initialize_pii_from_user
 
       def show
         pii_from_user
@@ -84,12 +85,6 @@ module Idv
       end
 
       private
-
-      def pii_from_user
-        user_session['idv/in_person'] ||= {}
-        user_session['idv/in_person'][:pii_from_user] ||= {}
-        user_session.dig('idv/in_person', :pii_from_user)
-      end
 
       def analytics_arguments
         {
@@ -168,6 +163,11 @@ module Idv
 
       def set_usps_form_presenter
         @presenter = Idv::InPerson::UspsFormPresenter.new
+      end
+
+      def initialize_pii_from_user
+        user_session['idv/in_person'] ||= {}
+        user_session['idv/in_person']['pii_from_user'] ||= {}
       end
     end
   end
