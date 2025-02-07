@@ -23,6 +23,8 @@ RSpec.describe Idv::InPerson::StateIdController do
       expect(subject).to have_actions(
         :before,
         :set_usps_form_presenter,
+        :initialize_pii_from_user,
+        :confirm_step_allowed,
       )
     end
 
@@ -33,6 +35,26 @@ RSpec.describe Idv::InPerson::StateIdController do
         get :show
 
         expect(response).to redirect_to idv_document_capture_url
+      end
+    end
+
+    context 'initializes idv/in_person if it is not present' do
+      it 'initializes idv/in_person' do
+        subject.user_session.delete('idv/in_person')
+        get :show
+
+        expect(subject.user_session['idv/in_person']).to eq(
+          { 'pii_from_user' => { 'uuid' => user.uuid } },
+        )
+      end
+    end
+
+    context 'initializes pii_from_user if it is not present' do
+      it 'initializes pii_from_user' do
+        subject.user_session['idv/in_person'].delete(:pii_from_user)
+        get :show
+
+        expect(subject.user_session['idv/in_person'][:pii_from_user]).to eq({ 'uuid' => user.uuid })
       end
     end
   end
@@ -64,6 +86,17 @@ RSpec.describe Idv::InPerson::StateIdController do
         subject.user_session['idv/in_person'].delete(:pii_from_user)
         get :show
 
+        expect(response).to render_template :show
+      end
+    end
+
+    context 'user_session does not have idv/in_person' do
+      before do
+        subject.user_session.delete('idv/in_person')
+      end
+
+      it 'renders the show template' do
+        get :show
         expect(response).to render_template :show
       end
     end

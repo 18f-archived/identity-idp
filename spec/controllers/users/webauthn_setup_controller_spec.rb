@@ -153,6 +153,12 @@ RSpec.describe Users::WebauthnSetupController do
         )
       end
 
+      it 'creates user event' do
+        expect(controller).to receive(:create_user_event).with(:webauthn_key_added)
+
+        response
+      end
+
       context 'with transports mismatch' do
         let(:params) { super().merge(transports: 'internal') }
 
@@ -189,6 +195,12 @@ RSpec.describe Users::WebauthnSetupController do
           response
 
           expect(flash[:success]).to eq(t('notices.webauthn_platform_configured'))
+        end
+
+        it 'creates user event' do
+          expect(controller).to receive(:create_user_event).with(:webauthn_platform_added)
+
+          response
         end
 
         context 'with transports mismatch' do
@@ -467,9 +479,6 @@ RSpec.describe Users::WebauthnSetupController do
           expect(@analytics).to have_logged_event(
             'Multi-Factor Authentication Setup',
             enabled_mfa_methods_count: 0,
-            errors: {
-              attestation_object: [I18n.t('errors.webauthn_platform_setup.general_error')],
-            },
             error_details: { attestation_object: { invalid: true } },
             in_account_creation_flow: false,
             mfa_method_counts: {},

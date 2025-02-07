@@ -845,6 +845,8 @@ event_types.sign_in_notification_timeframe_expired: Expired notification timefra
 event_types.sign_in_unsuccessful_2fa: Failed to authenticate
 event_types.webauthn_key_added: Hardware security key added
 event_types.webauthn_key_removed: Hardware security key removed
+event_types.webauthn_platform_added: Face or touch unlock added
+event_types.webauthn_platform_removed: Face or touch unlock removed
 forms.backup_code_regenerate.caution: If you regenerate your backup codes you will receive a new set of backup codes. Your original backup codes will no longer be valid.
 forms.backup_code_regenerate.confirm: Are you sure you want to regenerate your backup codes?
 forms.backup_code_reminder.body_info: If you ever lose access to your primary authentication method, you can use backup codes to regain access to your account.
@@ -1245,10 +1247,8 @@ in_person_proofing.body.location.distance.one: '%{count} mile away'
 in_person_proofing.body.location.distance.other: '%{count} miles away'
 in_person_proofing.body.location.heading: Post Office information
 in_person_proofing.body.location.info: No appointment is needed to verify your identity.
-in_person_proofing.body.location.inline_error: Enter a valid address with city, state, and ZIP code
 in_person_proofing.body.location.location_button: Select
 in_person_proofing.body.location.po_search.address_label: Address
-in_person_proofing.body.location.po_search.address_search_hint: 'Example: 1234 N Example St., Allentown, PA 12345'
 in_person_proofing.body.location.po_search.address_search_label: Enter an address to find a Post Office near you.
 in_person_proofing.body.location.po_search.city_label: City
 in_person_proofing.body.location.po_search.is_searching_message: Searching for Post Office locations…

@@ -48,9 +48,6 @@ RSpec.describe Idv::InPerson::AddressController do
       expect(subject).to have_actions(
         :before,
         :set_usps_form_presenter,
-      )
-      expect(subject).to have_actions(
-        :before,
         :confirm_step_allowed,
       )
     end

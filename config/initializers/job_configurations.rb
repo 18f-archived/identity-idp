@@ -26,13 +26,13 @@ else
       },
       # Send account deletion confirmation notifications
       account_reset_grant_requests_send_emails: {
-        class: 'AccountReset::GrantRequestsAndSendEmails',
+        class: 'GrantAccountResetRequestsAndSendEmailsJob',
         cron: cron_5m,
         args: -> { [Time.zone.now] },
       },
       # Send new device alert notifications
       create_new_device_alert_send_emails: {
-        class: 'CreateNewDeviceAlert',
+        class: 'CreateNewDeviceAlertJob',
         cron: cron_5m,
         args: -> { [Time.zone.now] },
       },
@@ -234,6 +234,12 @@ else
       weekly_authentication_report: {
         class: 'Reports::AuthenticationReport',
         cron: cron_every_monday,
+        args: -> { [Time.zone.yesterday.end_of_day] },
+      },
+      # Send A/B test reports
+      ab_tests_report: {
+        class: 'Reports::AbTestsReport',
+        cron: cron_24h,
         args: -> { [Time.zone.yesterday.end_of_day] },
       },
       # Send fraud metrics to Team Judy

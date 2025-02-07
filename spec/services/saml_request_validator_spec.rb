@@ -41,11 +41,7 @@ RSpec.describe SamlRequestValidator do
       ].each do |ial_value|
         let(:authn_context) { [ial_value] }
         it 'returns FormResponse with success: true' do
-          expect(response.to_h).to include(
-            success: true,
-            errors: nil,
-            **extra,
-          )
+          expect(response.to_h).to eq(success: true, **extra)
         end
       end
 
@@ -54,34 +50,18 @@ RSpec.describe SamlRequestValidator do
 
         context 'when it has block_encryption turned on' do
           before { sp.update!(block_encryption: 'aes256-cbc') }
-          let(:errors) do
-            {
-              service_provider: [t('errors.messages.no_cert_registered')],
-            }
-          end
-          let(:error_details) do
-            {
-              service_provider: {
-                no_cert_registered: true,
-              },
-            }
-          end
 
           it 'returns an error' do
             expect(response.to_h).to include(
-              errors:,
-              error_details:,
+              success: false,
+              error_details: { service_provider: { no_cert_registered: true } },
             )
           end
         end
 
         context 'when block encryption is not turned on' do
           it 'is valid' do
-            expect(response.to_h).to include(
-              success: true,
-              errors: nil,
-              **extra,
-            )
+            expect(response.to_h).to eq(success: true, **extra)
           end
         end
       end
@@ -94,11 +74,7 @@ RSpec.describe SamlRequestValidator do
         end
 
         it 'returns FormResponse with success: true' do
-          expect(response.to_h).to include(
-            success: true,
-            errors: nil,
-            **extra,
-          )
+          expect(response.to_h).to eq(success: true, **extra)
         end
       end
     end
@@ -106,11 +82,7 @@ RSpec.describe SamlRequestValidator do
     context 'no authn context and valid sp and authorized nameID format' do
       let(:authn_context) { [] }
       it 'returns FormResponse with success: true' do
-        expect(response.to_h).to include(
-          success: true,
-          errors: nil,
-          **extra,
-        )
+        expect(response.to_h).to eq(success: true, **extra)
       end
     end
 
@@ -118,14 +90,9 @@ RSpec.describe SamlRequestValidator do
       let(:sp) { ServiceProvider.find_by(issuer: 'foo') }
 
       it 'returns FormResponse with success: false' do
-        errors = {
-          service_provider: [t('errors.messages.unauthorized_service_provider')],
-        }
-
-        expect(response.to_h).to include(
+        expect(response.to_h).to eq(
           success: false,
-          errors: errors,
-          error_details: hash_including(*errors.keys),
+          error_details: { service_provider: { unauthorized_service_provider: true } },
           **extra,
         )
       end
@@ -135,14 +102,9 @@ RSpec.describe SamlRequestValidator do
       let(:name_id_format) { Saml::Idp::Constants::NAME_ID_FORMAT_EMAIL }
 
       it 'returns FormResponse with success: false' do
-        errors = {
-          nameid_format: [t('errors.messages.unauthorized_nameid_format')],
-        }
-
-        expect(response.to_h).to include(
+        expect(response.to_h).to eq(
           success: false,
-          errors: errors,
-          error_details: hash_including(*errors.keys),
+          error_details: { nameid_format: { unauthorized_nameid_format: true } },
           **extra,
         )
       end
@@ -155,11 +117,7 @@ RSpec.describe SamlRequestValidator do
       before { sp.update!(email_nameid_format_allowed: true) }
 
       it 'returns FormResponse with success: true' do
-        expect(response.to_h).to include(
-          success: true,
-          errors: nil,
-          **extra,
-        )
+        expect(response.to_h).to eq(success: true, **extra)
       end
 
       context 'ial2 authn context and ial2 sp' do
@@ -168,11 +126,7 @@ RSpec.describe SamlRequestValidator do
         before { sp.update!(ial: 2) }
 
         it 'returns FormResponse with success: true for ial2 on ial:2 sp' do
-          expect(response.to_h).to include(
-            success: true,
-            errors: nil,
-            **extra,
-          )
+          expect(response.to_h).to eq(success: true, **extra)
         end
       end
     end
@@ -189,11 +143,7 @@ RSpec.describe SamlRequestValidator do
             nameid_format: name_id_format,
           )
 
-          expect(response.to_h).to include(
-            success: true,
-            errors: nil,
-            **extra,
-          )
+          expect(response.to_h).to eq(success: true, **extra)
         end
       end
 
@@ -208,11 +158,7 @@ RSpec.describe SamlRequestValidator do
             nameid_format: name_id_format,
           )
 
-          expect(response.to_h).to include(
-            success: true,
-            errors: nil,
-            **extra,
-          )
+          expect(response.to_h).to eq(success: true, **extra)
         end
       end
     end
@@ -221,14 +167,9 @@ RSpec.describe SamlRequestValidator do
       Saml::Idp::Constants::PASSWORD_AUTHN_CONTEXT_CLASSREFS.each do |password_context|
         let(:authn_context) { [password_context] }
         it 'returns FormResponse with success: false for unknown authn context' do
-          errors = {
-            authn_context: [t('errors.messages.unauthorized_authn_context')],
-          }
-
-          expect(response.to_h).to include(
+          expect(response.to_h).to eq(
             success: false,
-            errors: errors,
-            error_details: hash_including(*errors.keys),
+            error_details: { authn_context: { unauthorized_authn_context: true } },
             **extra,
           )
         end
@@ -240,14 +181,9 @@ RSpec.describe SamlRequestValidator do
         let(:authn_context) { ['IAL1'] }
 
         it 'returns FormResponse with success: false' do
-          errors = {
-            authn_context: [t('errors.messages.unauthorized_authn_context')],
-          }
-
-          expect(response.to_h).to include(
+          expect(response.to_h).to eq(
             success: false,
-            errors: errors,
-            error_details: hash_including(*errors.keys),
+            error_details: { authn_context: { unauthorized_authn_context: true } },
             **extra,
           )
         end
@@ -256,11 +192,7 @@ RSpec.describe SamlRequestValidator do
           let(:authn_context) { ['IAL1', Saml::Idp::Constants::IAL_AUTH_ONLY_ACR] }
 
           it 'returns FormResponse with success: true' do
-            expect(response.to_h).to include(
-              success: true,
-              errors: nil,
-              **extra,
-            )
+            expect(response.to_h).to eq(success: true, **extra)
           end
         end
       end
@@ -273,14 +205,9 @@ RSpec.describe SamlRequestValidator do
           let(:authn_context) { [ial_value] }
 
           it 'returns FormResponse with success: false' do
-            errors = {
-              authn_context: [t('errors.messages.unauthorized_authn_context')],
-            }
-
-            expect(response.to_h).to include(
+            expect(response.to_h).to eq(
               success: false,
-              errors: errors,
-              error_details: hash_including(*errors.keys),
+              error_details: { authn_context: { unauthorized_authn_context: true } },
               **extra,
             )
           end
@@ -291,14 +218,9 @@ RSpec.describe SamlRequestValidator do
         let(:authn_context) { [Saml::Idp::Constants::IALMAX_AUTHN_CONTEXT_CLASSREF] }
 
         it 'returns FormResponse with success: false' do
-          errors = {
-            authn_context: [t('errors.messages.unauthorized_authn_context')],
-          }
-
-          expect(response.to_h).to include(
+          expect(response.to_h).to eq(
             success: false,
-            errors: errors,
-            error_details: hash_including(*errors.keys),
+            error_details: { authn_context: { unauthorized_authn_context: true } },
             **extra,
           )
         end
@@ -316,11 +238,7 @@ RSpec.describe SamlRequestValidator do
             end
 
             it 'returns a successful response' do
-              expect(response.to_h).to include(
-                success: true,
-                errors: nil,
-                **extra,
-              )
+              expect(response.to_h).to eq(success: true, **extra)
             end
           end
 
@@ -331,14 +249,9 @@ RSpec.describe SamlRequestValidator do
             end
 
             it 'fails with an unauthorized error' do
-              errors = {
-                authn_context: [t('errors.messages.unauthorized_authn_context')],
-              }
-
-              expect(response.to_h).to include(
+              expect(response.to_h).to eq(
                 success: false,
-                errors: errors,
-                error_details: hash_including(*errors.keys),
+                error_details: { authn_context: { unauthorized_authn_context: true } },
                 **extra,
               )
             end
@@ -368,11 +281,7 @@ RSpec.describe SamlRequestValidator do
             end
 
             it 'returns a successful response' do
-              expect(response.to_h).to include(
-                success: true,
-                errors: nil,
-                **extra,
-              )
+              expect(response.to_h).to eq(success: true, **extra)
             end
           end
         end
@@ -390,15 +299,12 @@ RSpec.describe SamlRequestValidator do
       let(:authn_context) { ['IAL1'] }
 
       it 'returns FormResponse with success: false' do
-        errors = {
-          authn_context: [t('errors.messages.unauthorized_authn_context')],
-          service_provider: [t('errors.messages.unauthorized_service_provider')],
-        }
-
-        expect(response.to_h).to include(
+        expect(response.to_h).to eq(
           success: false,
-          errors: errors,
-          error_details: hash_including(*errors.keys),
+          error_details: {
+            authn_context: { unauthorized_authn_context: true },
+            service_provider: { unauthorized_service_provider: true },
+          },
           **extra,
         )
       end
@@ -408,14 +314,9 @@ RSpec.describe SamlRequestValidator do
       let(:name_id_format) { Saml::Idp::Constants::NAME_ID_FORMAT_EMAIL }
 
       it 'returns FormResponse with success: false with unauthorized nameid format' do
-        errors = {
-          nameid_format: [t('errors.messages.unauthorized_nameid_format')],
-        }
-
-        expect(response.to_h).to include(
+        expect(response.to_h).to eq(
           success: false,
-          errors: errors,
-          error_details: hash_including(*errors.keys),
+          error_details: { nameid_format: { unauthorized_nameid_format: true } },
           **extra,
         )
       end
@@ -425,11 +326,7 @@ RSpec.describe SamlRequestValidator do
       let(:authn_context) { ['C1'] }
 
       it 'returns FormResponse with success true' do
-        expect(response.to_h).to include(
-          success: true,
-          errors: nil,
-          **extra,
-        )
+        expect(response.to_h).to eq(success: true, **extra)
       end
     end
 
@@ -439,11 +336,7 @@ RSpec.describe SamlRequestValidator do
       before { sp.update!(ial: 2) }
 
       it 'returns FormResponse with success true' do
-        expect(response.to_h).to include(
-          success: true,
-          errors: nil,
-          **extra,
-        )
+        expect(response.to_h).to eq(success: true, **extra)
       end
     end
 
@@ -453,14 +346,9 @@ RSpec.describe SamlRequestValidator do
       before { sp.update!(ial: 1) }
 
       it 'returns FormResponse with success false' do
-        errors = {
-          authn_context: [t('errors.messages.unauthorized_authn_context')],
-        }
-
-        expect(response.to_h).to include(
+        expect(response.to_h).to eq(
           success: false,
-          errors: errors,
-          error_details: hash_including(*errors.keys),
+          error_details: { authn_context: { unauthorized_authn_context: true } },
           **extra,
         )
       end
@@ -472,14 +360,9 @@ RSpec.describe SamlRequestValidator do
       before { sp.update!(ial: 1) }
 
       it 'returns FormResponse with success false' do
-        errors = {
-          authn_context: [t('errors.messages.unauthorized_authn_context')],
-        }
-
-        expect(response.to_h).to include(
+        expect(response.to_h).to eq(
           success: false,
-          errors: errors,
-          error_details: hash_including(*errors.keys),
+          error_details: { authn_context: { unauthorized_authn_context: true } },
           **extra,
         )
       end
@@ -490,14 +373,9 @@ RSpec.describe SamlRequestValidator do
       let(:authn_context) { ['C1'] }
 
       it 'returns FormResponse with success false' do
-        errors = {
-          authn_context: [t('errors.messages.unauthorized_authn_context')],
-        }
-
-        expect(response.to_h).to include(
+        expect(response.to_h).to eq(
           success: false,
-          errors: errors,
-          error_details: hash_including(*errors.keys),
+          error_details: { authn_context: { unauthorized_authn_context: true } },
           **extra,
         )
       end
@@ -507,14 +385,9 @@ RSpec.describe SamlRequestValidator do
       let(:authn_context) { ['Fa.Ke.Va.Lu.E0'] }
 
       it 'returns FormResponse with success false' do
-        errors = {
-          authn_context: [t('errors.messages.unauthorized_authn_context')],
-        }
-
-        expect(response.to_h).to include(
+        expect(response.to_h).to eq(
           success: false,
-          errors: errors,
-          error_details: hash_including(*errors.keys),
+          error_details: { authn_context: { unauthorized_authn_context: true } },
           **extra,
         )
       end

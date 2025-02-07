@@ -66,7 +66,6 @@ RSpec.describe WebauthnSetupForm do
 
           expect(result.to_h).to eq(
             success: true,
-            errors: nil,
             transports: ['usb'],
             transports_mismatch: false,
             **extra_attributes,
@@ -158,7 +157,6 @@ RSpec.describe WebauthnSetupForm do
         it 'includes unknown transports in extra analytics' do
           expect(result.to_h).to eq(
             success: true,
-            errors: nil,
             enabled_mfa_methods_count: 1,
             mfa_method_counts: { webauthn: 1 },
             multi_factor_auth_method: 'webauthn',
@@ -203,14 +201,6 @@ RSpec.describe WebauthnSetupForm do
 
         expect(result.to_h).to eq(
           success: false,
-          errors: {
-            attestation_object: [
-              I18n.t(
-                'errors.webauthn_setup.general_error_html',
-                link_html: I18n.t('errors.webauthn_setup.additional_methods_link'),
-              ),
-            ],
-          },
           error_details: { attestation_object: { invalid: true } },
           transports: ['usb'],
           transports_mismatch: false,
@@ -257,14 +247,6 @@ RSpec.describe WebauthnSetupForm do
 
         expect(result.to_h).to eq(
           success: false,
-          errors: {
-            attestation_object: [
-              I18n.t(
-                'errors.webauthn_setup.general_error_html',
-                link_html: I18n.t('errors.webauthn_setup.additional_methods_link'),
-              ),
-            ],
-          },
           error_details: { attestation_object: { invalid: true } },
           transports: ['usb'],
           transports_mismatch: false,
@@ -279,7 +261,6 @@ RSpec.describe WebauthnSetupForm do
       it 'returns setup as mismatched type' do
         expect(result.to_h).to eq(
           success: true,
-          errors: nil,
           enabled_mfa_methods_count: 1,
           mfa_method_counts: { webauthn_platform: 1 },
           multi_factor_auth_method: 'webauthn_platform',
@@ -386,6 +367,25 @@ RSpec.describe WebauthnSetupForm do
           it { is_expected.to eq(true) }
         end
       end
+    end
+  end
+
+  describe '#event_type' do
+    subject(:event_type) { form.event_type }
+
+    before do
+      form.submit(params)
+    end
+
+    it { is_expected.to eq(:webauthn_key_added) }
+
+    context 'with platform authenticator' do
+      let(:attestation) { platform_auth_attestation_object }
+      let(:params) do
+        super().merge(platform_authenticator: true, transports: 'internal,hybrid')
+      end
+
+      it { is_expected.to eq(:webauthn_platform_added) }
     end
   end
 
