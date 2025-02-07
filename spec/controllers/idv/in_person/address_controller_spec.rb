@@ -51,7 +51,7 @@ RSpec.describe Idv::InPerson::AddressController do
       )
       expect(subject).to have_actions(
         :before,
-        :confirm_in_person_address_step_needed,
+        :confirm_step_allowed,
       )
     end
 
