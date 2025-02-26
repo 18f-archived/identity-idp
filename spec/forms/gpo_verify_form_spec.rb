@@ -151,7 +151,6 @@ RSpec.describe GpoVerifyForm do
           create(
             :in_person_enrollment,
             :establishing,
-            profile: pending_profile,
             user: user,
           )
         end
@@ -327,7 +326,6 @@ RSpec.describe GpoVerifyForm do
         create(
           :in_person_enrollment,
           :establishing,
-          profile: pending_profile,
           user: user,
         )
       end

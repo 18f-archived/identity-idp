@@ -219,15 +219,6 @@ RSpec.describe User do
       )
     end
 
-    let(:establishing_enrollment_profile) do
-      create(
-        :profile,
-        gpo_verification_pending_at: 1.day.ago,
-        user: user,
-        pii: { first_name: 'Susan' },
-      )
-    end
-
     let!(:failed_enrollment) do
       create(:in_person_enrollment, :failed, user: user, profile: failed_enrollment_profile)
     end
@@ -239,7 +230,6 @@ RSpec.describe User do
         :in_person_enrollment,
         :establishing,
         user: user,
-        profile: establishing_enrollment_profile,
       )
     end
 
@@ -353,7 +343,6 @@ RSpec.describe User do
         create(
           :in_person_enrollment,
           :establishing,
-          profile: new_pending_profile,
           user: new_user,
         )
       end
@@ -379,7 +368,6 @@ RSpec.describe User do
         create(
           :in_person_enrollment,
           :passed,
-          profile: new_pending_profile,
           user: new_user,
         )
       end
