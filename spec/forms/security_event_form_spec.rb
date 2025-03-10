@@ -79,7 +79,8 @@ RSpec.describe SecurityEventForm do
         end
 
         it 'resets the user password for authorization fraud detected events' do
-          expect { submit }.to(change { user.reload.encrypted_password_digest })
+          # FIX ME
+          expect { submit }.to(change { user.reload.encrypted_password_digest_multi_region })
         end
       end
 

@@ -70,7 +70,8 @@ RSpec.describe ResetPasswordForm, type: :model do
         end
 
         it 'sets the user password to the submitted password' do
-          expect { result }.to change { user.reload.encrypted_password_digest }
+          # FIX ME
+          expect { result }.to change { user.reload.encrypted_password_digest_multi_region }
 
           expect(result.to_h).to eq(
             success: true,
@@ -330,7 +331,8 @@ RSpec.describe ResetPasswordForm, type: :model do
         end
 
         it 'sets the user password to the submitted password' do
-          expect { result }.to change { user.reload.encrypted_password_digest }
+          # FIX ME
+          expect { result }.to change { user.reload.encrypted_password_digest_multi_region }
 
           expect(result.to_h).to eq(
             success: true,
