@@ -132,7 +132,15 @@ module DocAuth
       end
 
       def parsed_pii_from_doc
-        if parsed_data_from_uploaded_file.has_key?('document')
+        return if !parsed_data_from_uploaded_file.has_key?('document')
+
+        if parsed_data_from_uploaded_file['document']['state_id_type'] == 'passport'
+          Pii::Passport.new(
+            **Idp::Constants::MOCK_IDV_APPLICANT.merge(
+              parsed_data_from_uploaded_file['document'].symbolize_keys,
+            ).slice(*Pii::Passport.members),
+          )
+        else
           Pii::StateId.new(
             **Idp::Constants::MOCK_IDV_APPLICANT.merge(
               parsed_data_from_uploaded_file['document'].symbolize_keys,
@@ -176,7 +184,7 @@ module DocAuth
 
       def all_doc_capture_values_passing?(doc_auth_result, id_type_supported)
         doc_auth_result == 'Passed' &&
-          id_type_supported &&
+        id_type_supported &&
           (selfie_check_performed? ? selfie_passed? : true)
       end
 
@@ -214,13 +222,13 @@ module DocAuth
       }.freeze
 
       def create_response_info(
-        doc_auth_result: 'Failed',
-        passed: [],
-        failed: DEFAULT_FAILED_ALERTS,
-        liveness_enabled: false,
-        image_metrics: DEFAULT_IMAGE_METRICS,
-        classification_info: nil
-      )
+            doc_auth_result: 'Failed',
+            passed: [],
+            failed: DEFAULT_FAILED_ALERTS,
+            liveness_enabled: false,
+            image_metrics: DEFAULT_IMAGE_METRICS,
+            classification_info: nil
+          )
         merged_image_metrics = DEFAULT_IMAGE_METRICS.deep_merge(image_metrics)
         {
           vendor: 'Mock',
