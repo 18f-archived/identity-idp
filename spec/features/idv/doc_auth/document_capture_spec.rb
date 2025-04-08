@@ -187,7 +187,8 @@ RSpec.feature 'document capture step', :js do
     end
   end
 
-  context 'with a valid passport', allow_browser_log: true do # ToDo: can we remove the allow_browser_log?
+  # ToDo: can we remove the allow_browser_log?
+  context 'with a valid passport', allow_browser_log: true do
     before do
       visit_idp_from_oidc_sp_with_ial2
       sign_in_and_2fa_user(@user)
@@ -209,7 +210,8 @@ RSpec.feature 'document capture step', :js do
     end
   end
 
-  context 'with an invalid passport', allow_browser_log: true do # ToDo: can we remove the allow_browser_log?
+  # ToDo: can we remove the allow_browser_log?
+  context 'with an invalid passport', allow_browser_log: true do
     before do
       visit_idp_from_oidc_sp_with_ial2
       sign_in_and_2fa_user(@user)

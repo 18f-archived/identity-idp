@@ -50,7 +50,7 @@ RSpec.describe DocAuth::Mock::DocAuthMockClient do
     )
   end
 
-  context "when given passport yaml" do
+  context 'when given passport yaml' do
     let(:post_front_image_response) do
       client.post_front_image(
         instance_id: instance_id,
@@ -64,7 +64,7 @@ RSpec.describe DocAuth::Mock::DocAuthMockClient do
         image: DocAuthImageFixtures.passport_passed_yaml.read,
       )
     end
-    
+
     let(:get_results_response) do
       client.get_results(
         instance_id: instance_id,
@@ -72,6 +72,7 @@ RSpec.describe DocAuth::Mock::DocAuthMockClient do
     end
 
     it 'handles a valid passport' do
+      valid_mrz
       expect(post_front_image_response.success?).to eq(true)
       expect(post_back_image_response.success?).to eq(true)
 
@@ -86,7 +87,9 @@ RSpec.describe DocAuth::Mock::DocAuthMockClient do
           birth_place: 'birthplace',
           passport_expiration: '2030-03-15',
           issuing_country_code: 'USA',
+          # rubocop:disable Metrics/LineLength
           mrz: 'P<UTOSAMPLE<<COMPANY<<<<<<<<<<<<<<<<<<<<<<<<ACU1234P<5UTO0003067F4003065<<<<<<<<<<<<<<02',
+          # rubocop:enable Metrics/LineLength
           passport_issued: '2015-03-15',
           nationality_code: 'USA',
           document_number: '000000',

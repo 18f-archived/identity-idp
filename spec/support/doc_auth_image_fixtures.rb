@@ -66,7 +66,7 @@ module DocAuthImageFixtures
   def self.passport_failed_yaml
     path = File.join(
       File.dirname(__FILE__),
-      '../fixtures/passport_bad_mrz_credential.yml'
+      '../fixtures/passport_bad_mrz_credential.yml',
     )
     Rack::Test::UploadedFile.new(path, Mime[:yaml])
   end
