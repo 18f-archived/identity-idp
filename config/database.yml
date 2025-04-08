@@ -1,6 +1,5 @@
 postgresql: &postgresql
   adapter: postgresql
-  encoding: utf8
   database: identity_idp_<%= Rails.env %>
   port: 5432
   username: <%= ENV['DOCKER_DB_USER'] %>
@@ -26,6 +25,7 @@ development:
     <<: *defaults
     adapter: postgresql
     migrations_paths: db/primary_migrate
+    prepared_statements: false
   read_replica:
     <<: *defaults
     adapter: postgresql
@@ -34,6 +34,7 @@ development:
     <<: *defaults
     database: identity_idp_worker_jobs_<%= Rails.env %>
     migrations_paths: db/worker_jobs_migrate
+    prepared_statements: false
 
 test:
   primary: &test
