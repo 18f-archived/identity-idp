@@ -1,8 +1,6 @@
   
 # frozen_string_literal: true
 
-Encoding.default_internal = nil # for pg version >= 1.5.4 it's not necessary
-
 class ActiveRecord::ConnectionAdapters::PostgreSQLAdapter
   private
 
