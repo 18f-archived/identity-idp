@@ -1,8 +1,6 @@
   
 # frozen_string_literal: true
 
-return unless ENV.fetch("APPLY_CONFIG_FOR_RDS_PROXY", "true") == "true"
-
 Encoding.default_internal = nil # for pg version >= 1.5.4 it's not necessary
 
 class ActiveRecord::ConnectionAdapters::PostgreSQLAdapter
