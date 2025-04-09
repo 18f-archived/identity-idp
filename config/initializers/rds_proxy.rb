@@ -16,7 +16,7 @@ class ActiveRecord::ConnectionAdapters::PostgreSQLAdapter
         # if @config[:encoding]
         #   @raw_connection.set_client_encoding(@config[:encoding])
         # end
-        # self.client_min_messages = @config[:min_messages] || "warning"
+        self.client_min_messages = nil
         self.schema_search_path = @config[:schema_search_path] || @config[:schema_order]
 
         # unless ActiveRecord.db_warnings_action.nil?
