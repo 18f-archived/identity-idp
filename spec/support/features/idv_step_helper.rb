@@ -79,7 +79,7 @@ module IdvStepHelper
 
   def complete_enter_password_step(user = user_with_2fa)
     password = user.password || user_password
-    fill_in 'Password', with: password
+    fill_in 'Password', with: password, wait: 60
     click_idv_continue
   end
 

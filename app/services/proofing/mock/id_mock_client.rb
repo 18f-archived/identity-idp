@@ -66,15 +66,10 @@ module Proofing
       end
 
       def jurisdiction_not_supported?(applicant)
-        case applicant[:state_id_type]
-        when 'passport'
-          false
-        when 'state_id_card', 'drivers_permit', 'drivers_license'
-          state_id_jurisdiction = applicant[:state_id_jurisdiction]
-          !IdentityConfig.store.aamva_supported_jurisdictions.include? state_id_jurisdiction
-        else
-          true
-        end
+        return false if applicant[:state_id_type] == 'passport'
+
+        state_id_jurisdiction = applicant[:state_id_jurisdiction]
+        !IdentityConfig.store.aamva_supported_jurisdictions.include? state_id_jurisdiction
       end
 
       def invalid_state_id_number?(state_id_number)
