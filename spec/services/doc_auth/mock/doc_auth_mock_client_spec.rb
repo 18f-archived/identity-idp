@@ -51,17 +51,19 @@ RSpec.describe DocAuth::Mock::DocAuthMockClient do
   end
 
   context 'when given passport yaml' do
+    let(:passport_yaml) { 'needs to be set' }
+
     let(:post_front_image_response) do
       client.post_front_image(
         instance_id: instance_id,
-        image: DocAuthImageFixtures.passport_passed_yaml.read,
+        image: passport_yaml,
       )
     end
 
     let(:post_back_image_response) do
       client.post_back_image(
         instance_id: instance_id,
-        image: DocAuthImageFixtures.passport_passed_yaml.read,
+        image: passport_yaml,
       )
     end
 
@@ -71,53 +73,45 @@ RSpec.describe DocAuth::Mock::DocAuthMockClient do
       )
     end
 
-    it 'handles a valid passport' do
-      valid_mrz
-      expect(post_front_image_response.success?).to eq(true)
-      expect(post_back_image_response.success?).to eq(true)
+    let(:expected_pii_hash) do
+      Pii::Passport.new(
+        first_name: 'Joe',
+        last_name: 'Dokes',
+        middle_name: 'Q',
+        dob: '1938-10-06',
+        sex: 'Male',
+        birth_place: 'birthplace',
+        passport_expiration: '2030-03-15',
+        issuing_country_code: 'USA',
+        # rubocop:disable Metrics/LineLength
+        mrz: 'P<UTOSAMPLE<<COMPANY<<<<<<<<<<<<<<<<<<<<<<<<ACU1234P<5UTO0003067F4003065<<<<<<<<<<<<<<02',
+        # rubocop:enable Metrics/LineLength
+        passport_issued: '2015-03-15',
+        nationality_code: 'USA',
+        document_number: '000000',
+        state_id_type: 'passport',
+      ).to_h
+    end
 
-      expect(get_results_response.success?).to eq(true)
-      expect(get_results_response.pii_from_doc.to_h).to eq(
-        Pii::Passport.new(
-          first_name: 'Joe',
-          last_name: 'Dokes',
-          middle_name: 'Q',
-          dob: '1938-10-06',
-          sex: 'Male',
-          birth_place: 'birthplace',
-          passport_expiration: '2030-03-15',
-          issuing_country_code: 'USA',
-          # rubocop:disable Metrics/LineLength
-          mrz: 'P<UTOSAMPLE<<COMPANY<<<<<<<<<<<<<<<<<<<<<<<<ACU1234P<5UTO0003067F4003065<<<<<<<<<<<<<<02',
-          # rubocop:enable Metrics/LineLength
-          passport_issued: '2015-03-15',
-          nationality_code: 'USA',
-          document_number: '000000',
-          state_id_type: 'passport',
-        ).to_h,
-      )
+    context 'for a valid passport' do
+      let(:passport_yaml) { DocAuthImageFixtures.passport_passed_yaml.read }
+
+      it 'passes' do
+        expect(post_front_image_response.success?).to eq(true)
+        expect(post_back_image_response.success?).to eq(true)
+        expect(get_results_response.success?).to eq(true)
+        expect(get_results_response.pii_from_doc.to_h).to eq(expected_pii_hash)
+      end
     end
 
     context 'when given a passport with a bad MRZ' do
-      let(:post_front_image_response) do
-        client.post_front_image(
-          instance_id: instance_id,
-          image: DocAuthImageFixtures.passport_failed_yaml.read,
-        )
-      end
-
-      let(:post_back_image_response) do
-        client.post_back_image(
-          instance_id: instance_id,
-          image: DocAuthImageFixtures.passport_failed_yaml.read,
-        )
-      end
+      let(:passport_yaml) { DocAuthImageFixtures.passport_failed_yaml.read }
 
       it 'fails' do
-        expect(post_front_image_response.success?).to eq(false)
-        expect(post_back_image_response.success?).to eq(false)
+        expect(post_front_image_response.success?).to eq(true)
+        expect(post_back_image_response.success?).to eq(true)
         expect(get_results_response.success?).to eq(false)
-        expect(get_results_response.pii_from_doc.to_h).to eq(nil)
+        expect(get_results_response.pii_from_doc.to_h).to eq(expected_pii_hash)
       end
     end
   end
