@@ -1968,6 +1968,7 @@ module AnalyticsEvents
   # @option extra [String] 'ClassificationMode'
   # @option extra [Boolean] 'OrientationChanged'
   # @option extra [Boolean] 'PresentationChanged'
+  # @option extra [Boolean] 'PassportCheckResult'
   # @param ["Passport","DriversLicense"] document_type Document capture user flow
   # The document capture image was uploaded to vendor during the IDV process
   def idv_doc_auth_submitted_image_upload_vendor(
