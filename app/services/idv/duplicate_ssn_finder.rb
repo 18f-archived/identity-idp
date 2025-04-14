@@ -13,8 +13,6 @@ module Idv
       Profile.where.not(user_id: user.id).where(ssn_signature: ssn_signatures).empty?
     end
 
-    private
-
     def ssn_signatures
       current_signature = ssn_signature(Pii::Fingerprinter.current_key)
       old_signatures = IdentityConfig.store.hmac_fingerprinter_key_queue.map do |key|
@@ -22,6 +20,8 @@ module Idv
       end
       [current_signature] + old_signatures
     end
+
+    private
 
     def ssn_signature(key)
       Pii::Fingerprinter.fingerprint(ssn, key)
