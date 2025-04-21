@@ -111,7 +111,7 @@ RSpec.describe Idv::InPersonController do
       end
     end
 
-    context 'when the issuer has IPP disabled' do
+    context 'when the service provider has IPP disabled' do
       let(:sp) { create(:service_provider, in_person_proofing_enabled: false) }
 
       it 'renders 404 not found' do
@@ -123,7 +123,7 @@ RSpec.describe Idv::InPersonController do
   end
 
   describe '#update' do
-    context 'when the issuer has IPP enabled' do
+    context 'when the service provider has IPP enabled' do
       let(:sp) { create(:service_provider, in_person_proofing_enabled: true) }
 
       context 'with in person proofing enabled' do
@@ -214,7 +214,7 @@ RSpec.describe Idv::InPersonController do
       end
     end
 
-    context 'when the issuer has IPP disabled' do
+    context 'when the service provider has IPP disabled' do
       let(:sp) { create(:service_provider, in_person_proofing_enabled: false) }
 
       it 'renders 404 not found' do
