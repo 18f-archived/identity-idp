@@ -32,10 +32,10 @@ RSpec.describe Idv::InPersonController do
   end
 
   describe '#index' do
-    context 'when the issuer has IPP enabled' do
+    context 'when the service provider has IPP enabled' do
       let(:sp) { create(:service_provider, in_person_proofing_enabled: true) }
 
-      context 'with in person proofing enabled' do
+      context 'when in person proofing enabled in the application' do
         let(:user) { nil }
         let(:in_person_proofing_enabled) { true }
 
@@ -48,13 +48,17 @@ RSpec.describe Idv::InPersonController do
         context 'signed in' do
           let(:user) { build(:user) }
 
+          before do
+            allow(controller).to receive(:idv_session).and_return(idv_session)
+          end
+
           it 'redirects to idv' do
             get :index
 
             expect(response).to redirect_to idv_url
           end
 
-          context 'with establishing in-person enrollment' do
+          context 'when user has an establishing in-person enrollment' do
             before do
               create(:in_person_enrollment, :establishing, user: user)
             end
@@ -79,35 +83,27 @@ RSpec.describe Idv::InPersonController do
               expect(assigns(:presenter)).to be_kind_of(Idv::InPerson::UspsFormPresenter)
             end
 
-            context 'with in person proofing enabled for service provider' do
+            context 'when in person passports are allowed' do
               before do
-                ServiceProvider.find_by(issuer: sp.issuer)
-                  .update(in_person_proofing_enabled: true)
-                allow(controller).to receive(:idv_session).and_return(idv_session)
+                allow(idv_session).to receive(:in_person_passports_allowed?).and_return(true)
               end
 
-              context 'when in person passports are allowed' do
-                before do
-                  allow(idv_session).to receive(:in_person_passports_allowed?).and_return(true)
-                end
+              it 'redirects to the choose ID type page' do
+                get :index
 
-                it 'redirects to the choose ID type page' do
-                  get :index
+                expect(response).to redirect_to idv_in_person_choose_id_type_path
+              end
+            end
 
-                  expect(response).to redirect_to idv_in_person_choose_id_type_path
-                end
+            context 'when passports are not allowed' do
+              before do
+                allow(idv_session).to receive(:in_person_passports_allowed?).and_return(false)
               end
 
-              context 'when passports are not allowed' do
-                before do
-                  allow(idv_session).to receive(:in_person_passports_allowed?).and_return(false)
-                end
+              it 'redirects to the state ID page' do
+                get :index
 
-                it 'redirects to the state ID page' do
-                  get :index
-
-                  expect(response).to redirect_to idv_in_person_state_id_path
-                end
+                expect(response).to redirect_to idv_in_person_state_id_path
               end
             end
           end
@@ -115,7 +111,7 @@ RSpec.describe Idv::InPersonController do
       end
     end
 
-    context 'when the issuer does not have IPP enabled' do
+    context 'when the issuer has IPP disabled' do
       let(:sp) { create(:service_provider, in_person_proofing_enabled: false) }
 
       it 'renders 404 not found' do
@@ -142,6 +138,10 @@ RSpec.describe Idv::InPersonController do
 
         context 'signed in' do
           let(:user) { build(:user) }
+
+          before do
+            allow(controller).to receive(:idv_session).and_return(idv_session)
+          end
 
           it 'redirects to idv' do
             put :update
@@ -174,35 +174,27 @@ RSpec.describe Idv::InPersonController do
               expect(assigns(:presenter)).to be_kind_of(Idv::InPerson::UspsFormPresenter)
             end
 
-            context 'with in person proofing enabled for service provider' do
+            context 'when in person passports are allowed' do
               before do
-                ServiceProvider.find_by(issuer: sp.issuer)
-                  .update(in_person_proofing_enabled: true)
-                allow(controller).to receive(:idv_session).and_return(idv_session)
+                allow(idv_session).to receive(:in_person_passports_allowed?).and_return(true)
               end
 
-              context 'when in person passports are allowed' do
-                before do
-                  allow(idv_session).to receive(:in_person_passports_allowed?).and_return(true)
-                end
+              it 'redirects to the choose ID type page' do
+                put :update
 
-                it 'redirects to the choose ID type page' do
-                  put :update
+                expect(response).to redirect_to idv_in_person_choose_id_type_path
+              end
+            end
 
-                  expect(response).to redirect_to idv_in_person_choose_id_type_path
-                end
+            context 'when passports are not allowed' do
+              before do
+                allow(idv_session).to receive(:in_person_passports_allowed?).and_return(false)
               end
 
-              context 'when passports are not allowed' do
-                before do
-                  allow(idv_session).to receive(:in_person_passports_allowed?).and_return(false)
-                end
+              it 'redirects to the state ID page' do
+                put :update
 
-                it 'redirects to the state ID page' do
-                  put :update
-
-                  expect(response).to redirect_to idv_in_person_state_id_path
-                end
+                expect(response).to redirect_to idv_in_person_state_id_path
               end
             end
 

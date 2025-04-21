@@ -10,7 +10,6 @@ RSpec.describe Idv::InPerson::ChooseIdTypeController do
     stub_sign_in(user)
     stub_up_to(:hybrid_handoff, idv_session: subject.idv_session)
     allow(IdentityConfig.store).to receive(:in_person_proofing_opt_in_enabled).and_return(true)
-    allow(IdentityConfig.store).to receive(:in_person_passports_enabled).and_return(false)
     stub_analytics
   end
 

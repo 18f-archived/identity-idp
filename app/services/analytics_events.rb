@@ -3106,8 +3106,8 @@ module AnalyticsEvents
   # @param ["hybrid","standard"] flow_path Document capture user flow
   # @param [String] step Current IdV step
   # @param [String] analytics_id
-  # @param [Boolean] skip_hybrid_handoff Whether skipped hybrid handoff A/B test is active
   # @param [Boolean] opted_in_to_in_person_proofing Whether user opted into in person proofing
+  # @param [Boolean] skip_hybrid_handoff Whether skipped hybrid handoff A/B test is active
   def idv_in_person_proofing_choose_id_type_visited(
     flow_path:,
     step:,
