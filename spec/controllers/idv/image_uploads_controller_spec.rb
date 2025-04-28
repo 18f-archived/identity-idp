@@ -29,6 +29,7 @@ RSpec.describe Idv::ImageUploadsController do
         front_image_metadata: '{"glare":99.99}',
         back: back_image,
         selfie: selfie_img,
+        passport: nil,
         back_image_metadata: '{"glare":99.99}',
         document_capture_session_uuid: document_capture_session.uuid,
         flow_path: flow_path,
@@ -164,7 +165,7 @@ RSpec.describe Idv::ImageUploadsController do
             result_failed: false,
             ocr_pii: nil,
             doc_type_supported: true,
-            failed_image_fingerprints: { front: [], back: [], selfie: [] },
+            failed_image_fingerprints: { front: [], back: [], passport: [], selfie: [] },
             submit_attempts: 2,
           },
         )
@@ -182,7 +183,7 @@ RSpec.describe Idv::ImageUploadsController do
             result_failed: false,
             ocr_pii: nil,
             doc_type_supported: true,
-            failed_image_fingerprints: { front: [], back: [], selfie: [] },
+            failed_image_fingerprints: { front: [], back: [], passport: [], selfie: [] },
             submit_attempts: IdentityConfig.store.doc_auth_max_attempts,
           }
         end
@@ -299,6 +300,7 @@ RSpec.describe Idv::ImageUploadsController do
             .to receive(:post_images).with(
               front_image: an_instance_of(String),
               back_image: an_instance_of(String),
+              passport_image: nil,
               selfie_image: an_instance_of(String),
               document_type: an_instance_of(String),
               image_source: :unknown,
@@ -322,6 +324,7 @@ RSpec.describe Idv::ImageUploadsController do
           .to receive(:post_images).with(
             front_image: an_instance_of(String),
             back_image: an_instance_of(String),
+            passport_image: nil,
             selfie_image: nil,
             document_type: an_instance_of(String),
             image_source: :unknown,
@@ -378,6 +381,7 @@ RSpec.describe Idv::ImageUploadsController do
           vendor_request_time_in_ms: a_kind_of(Float),
           front_image_fingerprint: an_instance_of(String),
           back_image_fingerprint: an_instance_of(String),
+          passport_check_result: {},
           doc_type_supported: boolean,
           doc_auth_success: boolean,
           selfie_status: :not_processed,
@@ -1084,6 +1088,7 @@ RSpec.describe Idv::ImageUploadsController do
             front_image: an_instance_of(String),
             back_image: an_instance_of(String),
             selfie_image: an_instance_of(String),
+            passport_image: nil,
             document_type: an_instance_of(String),
             image_source: :unknown,
             user_uuid: an_instance_of(String),
@@ -1109,6 +1114,7 @@ RSpec.describe Idv::ImageUploadsController do
           .to receive(:post_images).with(
             front_image: an_instance_of(String),
             back_image: an_instance_of(String),
+            passport_image: nil,
             selfie_image: nil,
             image_source: :unknown,
             user_uuid: an_instance_of(String),
