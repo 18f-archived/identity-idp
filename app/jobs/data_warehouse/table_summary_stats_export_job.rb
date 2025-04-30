@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'reporting/cloudwatch_client'
+
 module DataWarehouse
   class TableSummaryStatsExportJob < BaseJob
     REPORT_NAME = 'table_summary_stats'
@@ -18,8 +20,45 @@ module DataWarehouse
     def perform(timestamp)
       return if data_warehouse_disabled?
 
-      data = fetch_table_max_ids_and_counts(timestamp)
+      idp_data = fetch_table_max_ids_and_counts(timestamp)
+      cloudwatch_data = fetch_log_group_counts(timestamp)
+      data = {}
+      data["idp"] = idp_data
+      data["logs"] = cloudwatch_data
       upload_to_s3(data, timestamp)
+    end
+
+    def fetch_log_group_counts(timestamp)
+      log_groups.each_with_object({}) do |log_group_name, result|
+        table_name = "logs." + log_group_name.split('/').last.split('.').first
+        result[table_name] = cloudwatch_client(log_group_name: log_group_name).fetch(
+          query: cloudwatch_query,
+          from: timestamp.beginning_of_day,
+          to: timestamp.end_of_day,
+        )[0]
+      end
+    end
+
+    def log_groups
+      env = Identity::Hostdata.env
+      [
+        "#{env}_/srv/idp/shared/log/events.log",
+        "#{env}_/srv/idp/shared/log/production.log",
+      ]
+    end
+
+    def cloudwatch_client(log_group_name: nil)
+      Reporting::CloudwatchClient.new(
+        log_group_name: log_group_name,
+        ensure_complete_logs: false,
+      )
+    end
+
+    def cloudwatch_query
+      <<~QUERY
+        fields @timestamp
+        | stats count() as count
+      QUERY
     end
 
     def fetch_table_max_ids_and_counts(timestamp)
